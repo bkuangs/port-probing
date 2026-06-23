@@ -10,6 +10,27 @@ The probing script is [`scripts/probe_live_connections.py`](../scripts/probe_liv
 
 That distinction matters because UDP has no persistent connection state. A UDP socket can be open, idle, sending one-way packets, or sending to many destinations.
 
+## Useful Commands
+```text
+python3 scripts/probe_live_connections.py --list-router-endpoints
+```
+This runs one socket snapshot using netstat -tunap. It combines ports from the parsed router config and the script’s known extra PX4/Gazebo ports.  
+```text
+sudo python3 scripts/probe_live_connections.py --probe-endpoint simulator --sniff 10 --interface any
+```
+This does the normal socket snapshot, then runs a 10-second packet capture over the known/router ports.  
+```text
+sudo python3 scripts/probe_live_connections.py --find-port 15550 --sniff 10 --interface any
+```
+1. Find sockets owned by mavlink-routerd.  
+2. Extract their local source ports.  
+3. Sniff packets whose source port is one of those.  
+4. Summarize destinations.  
+```text
+sudo python3 scripts/probe_live_connections.py --owner-outgoing mavlink-routerd --sniff 10 --interface any
+```
+This does the same owner-based tracing, but for Gazebo. Expected useful output is the Gazebo camera stream.  
+
 ## Router Config Parsing
 
 By default, the script reads:
